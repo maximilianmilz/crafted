@@ -22,8 +22,11 @@ import org.springframework.stereotype.Service;
 
 import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,9 +42,17 @@ public class TicketService {
                                 Optional<Boolean> verified,
                                 Optional<Status> status,
                                 Optional<Order> createdOrder) {
-        return repository.findAll(searchTerm, userName, tags, verified, status, createdOrder).stream()
-                .map(TicketMapper::map)
-                .toList();
+        List<Ticket> tickets = new ArrayList<>();
+
+        var ticketRecords = repository.findAll(searchTerm, userName, tags, verified, status, createdOrder);
+
+        var map = ticketRecords.stream().collect(Collectors.groupingBy(TicketRecord::getId));
+
+        for (Map.Entry<Long, List<TicketRecord>> entry : map.entrySet()) {
+            tickets.add(TicketMapper.map(entry.getValue().get(0)));
+        }
+
+        return tickets;
     }
 
     private Optional<Ticket> findById(long id) {

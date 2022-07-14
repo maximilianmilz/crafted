@@ -39,7 +39,6 @@ public class TicketRepository {
             created = createdOrder.get().equals(Order.ASC) ? TICKET.CREATED.asc() : TICKET.CREATED.desc();
         }
 
-
         return context.select().from(TICKET)
                 .leftJoin(USER).on(TICKET.USER_ID.eq(USER.ID))
                 .leftJoin(TICKET_TAG).on(TICKET.ID.eq(TICKET_TAG.TICKET_ID))
